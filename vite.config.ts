@@ -32,15 +32,57 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
+    sourcemap: process.env.NODE_ENV !== "production",
+    chunkSizeWarningLimit: 400,
     rollupOptions: {
       output: {
-        manualChunks: undefined,
-      },
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'routing': ['wouter'],
+          'data-management': ['@tanstack/react-query'],
+          'firebase-core': ['firebase/app', 'firebase/auth'],
+          'firebase-services': ['firebase/firestore', 'firebase/storage'],
+          'ui-components': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-tooltip'
+          ],
+          'form-handling': ['react-hook-form', '@hookform/resolvers/zod', 'zod'],
+          'utils': ['date-fns', 'clsx', 'class-variance-authority']
+        },
+        assetFileNames: (assetInfo) => {
+          let extType = assetInfo.name.split('.').at(1);
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = 'img';
+          }
+          return `assets/${extType}/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+      }
     },
+    target: 'esnext',
+    minify: 'esbuild'
   },
   server: {
-    fs: {
-      strict: true,
-    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      }
+    }
   },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'wouter',
+      '@tanstack/react-query',
+      'firebase/app',
+      'firebase/auth',
+      'firebase/firestore',
+      'firebase/storage'
+    ]
+  }
 });
