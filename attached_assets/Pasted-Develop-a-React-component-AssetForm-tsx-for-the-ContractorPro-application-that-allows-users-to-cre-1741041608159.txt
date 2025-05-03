@@ -1,0 +1,140 @@
+Develop a React component (AssetForm.tsx) for the ContractorPro application that allows users to create or update asset records with detailed information. The form should be organized into collapsible sections for better usability and include form validation and image upload functionality.
+
+Requirements:
+
+Form Structure:
+
+General Information (always visible):
+
+Asset Name (required text input)
+
+Asset Photo URL (required upload)
+
+Category (select: Vehicles, Heavy Equipment, Tools, IT, Other)
+
+Location (select: Warehouse, Site A, Site B, Office, Other)
+
+Purchase Date (date input)
+
+Specifications (collapsible):
+
+Manufacturer (text input)
+
+Model (text input)
+
+Serial Number (text input)
+
+Condition (select: New, Good, Needs Repair, Decommissioned)
+
+Purchase Price (number input)
+
+Warranty Expiry (date input)
+
+Assignment & Tracking (collapsible):
+
+Assigned To (text input)
+
+Usage Type (select: Company-Owned, Rented, Leased)
+
+Last Maintenance Date (date input)
+
+Next Maintenance Date (date input)
+
+Notes (collapsible):
+
+Internal Notes (textarea)
+
+Functionality:
+
+Accordion-based UI for organizing the form into sections.
+
+Form validation using Zod schema.
+
+Image upload for asset photos.
+
+Conditional rendering based on whether the form is used for creating a new asset or updating an existing one.
+
+Additional Considerations:
+
+Ensure the form is responsive and user-friendly.
+
+Implement error handling and display validation messages clearly.
+
+Use state management to handle form data and user interactions.
+
+Deliverables:
+
+A fully functional AssetForm.tsx React component.
+
+Integration with Zod for form validation.
+
+Proper TypeScript interfaces/types for form data.
+
+Styling to match the existing ContractorPro UI.
+
+Example Code Structure:
+
+tsx
+Copy
+import React, { useState } from 'react';
+import { useForm, zodResolver } from '@mantine/form';
+import { z } from 'zod';
+
+const schema = z.object({
+  assetName: z.string().min(1, { message: 'Asset Name is required' }),
+  // Add other fields here
+});
+
+const AssetForm = ({ asset, onSubmit }) => {
+  const form = useForm({
+    initialValues: {
+      assetName: asset?.assetName || '',
+      // Initialize other fields here
+    },
+    validate: zodResolver(schema),
+  });
+
+  const handleSubmit = (values) => {
+    onSubmit(values);
+  };
+
+  return (
+    <form onSubmit={form.onSubmit(handleSubmit)}>
+      {/* General Information Section */}
+      <div>
+        <label>Asset Name</label>
+        <input {...form.getInputProps('assetName')} />
+        {/* Add other fields here */}
+      </div>
+
+      {/* Specifications Section */}
+      <div>
+        <h3>Specifications</h3>
+        {/* Add fields for Specifications */}
+      </div>
+
+      {/* Assignment & Tracking Section */}
+      <div>
+        <h3>Assignment & Tracking</h3>
+        {/* Add fields for Assignment & Tracking */}
+      </div>
+
+      {/* Notes Section */}
+      <div>
+        <h3>Notes</h3>
+        {/* Add fields for Notes */}
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default AssetForm;
+Next Steps:
+
+Implement the form fields and validation as per the requirements.
+
+Ensure the form integrates seamlessly with the existing application.
+
+Test the form thoroughly for usability and functionality.

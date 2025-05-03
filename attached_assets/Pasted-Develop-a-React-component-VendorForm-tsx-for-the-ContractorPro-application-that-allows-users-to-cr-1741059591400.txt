@@ -1,0 +1,154 @@
+Develop a React component (VendorForm.tsx) for the ContractorPro application that allows users to create or update vendor information. The form should be organized into collapsible sections for better usability and include form validation and document upload functionality.
+
+Requirements:
+
+Form Structure:
+
+Company Information:
+
+Company Name (required text input)
+
+ABN (text input)
+
+Industry (select: Electrical, Plumbing, Civil, Mechanical, Construction, Other)
+
+Address (text input)
+
+Website (URL input)
+
+Contact Information:
+
+Contact Name (text input)
+
+Contact Email (email input)
+
+Contact Phone (text input)
+
+Compliance:
+
+License Number (text input)
+
+Insurance Expiry (date input)
+
+Compliance Status (select: Pending, Approved, Expired)
+
+Payment Details:
+
+Bank Name (text input)
+
+Account Name (text input)
+
+BSB (text input)
+
+Bank Account (text input)
+
+Payment Terms (select: Net7, Net14, Net30, Net60)
+
+Additional Information:
+
+Rating (number input, 1-5)
+
+Approval Status (select: Pending, Approved, Rejected)
+
+Internal Notes (textarea)
+
+Functionality:
+
+Accordion-based UI for organizing the form into sections.
+
+Form validation using Zod schema.
+
+Document upload and management.
+
+State management for creating/updating vendor records.
+
+Additional Considerations:
+
+Ensure the form is responsive and user-friendly.
+
+Implement error handling and display validation messages clearly.
+
+Use state management to handle form data and user interactions.
+
+Deliverables:
+
+A fully functional VendorForm.tsx React component.
+
+Integration with Zod for form validation.
+
+Proper TypeScript interfaces/types for form data.
+
+Styling to match the existing ContractorPro UI.
+
+Example Code Structure:
+
+tsx
+Copy
+import React, { useState } from 'react';
+import { useForm, zodResolver } from '@mantine/form';
+import { z } from 'zod';
+
+const schema = z.object({
+  companyName: z.string().min(1, { message: 'Company Name is required' }),
+  // Add other fields here
+});
+
+const VendorForm = ({ vendor, onSubmit }) => {
+  const form = useForm({
+    initialValues: {
+      companyName: vendor?.companyName || '',
+      // Initialize other fields here
+    },
+    validate: zodResolver(schema),
+  });
+
+  const handleSubmit = (values) => {
+    onSubmit(values);
+  };
+
+  return (
+    <form onSubmit={form.onSubmit(handleSubmit)}>
+      {/* Company Information Section */}
+      <div>
+        <label>Company Name</label>
+        <input {...form.getInputProps('companyName')} />
+        {/* Add other fields here */}
+      </div>
+
+      {/* Contact Information Section */}
+      <div>
+        <h3>Contact Information</h3>
+        {/* Add fields for Contact Information */}
+      </div>
+
+      {/* Compliance Section */}
+      <div>
+        <h3>Compliance</h3>
+        {/* Add fields for Compliance */}
+      </div>
+
+      {/* Payment Details Section */}
+      <div>
+        <h3>Payment Details</h3>
+        {/* Add fields for Payment Details */}
+      </div>
+
+      {/* Additional Information Section */}
+      <div>
+        <h3>Additional Information</h3>
+        {/* Add fields for Additional Information */}
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default VendorForm;
+Next Steps:
+
+Implement the form fields and validation as per the requirements.
+
+Ensure the form integrates seamlessly with the existing application.
+
+Test the form thoroughly for usability and functionality.

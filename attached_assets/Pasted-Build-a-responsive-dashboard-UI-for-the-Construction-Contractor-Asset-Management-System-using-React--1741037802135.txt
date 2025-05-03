@@ -1,0 +1,78 @@
+Build a responsive dashboard UI for the Construction Contractor Asset Management System using React, Tailwind CSS, and shadcn/ui components. The dashboard already has a static layout (see attached screenshots), so focus on integrating dynamic data fetching and enhancing the UI with interactive components. Follow these requirements:
+
+Dashboard Layout:
+
+Use the existing static layout as a base (see attached screenshots).
+
+Add stats cards for key metrics:
+
+totalVendors
+
+totalAssets
+
+expiringInsurance
+
+maintenanceDue
+
+Include a Recent Activity section to display:
+
+Recent vendors (company name and contact name).
+
+Recent assets (asset name and location).
+
+Data Fetching:
+
+Use TanStack Query (useQuery) to fetch data from the backend API.
+
+Ensure all sensitive data is fetched securely from the backend API (e.g., vendor details, asset information).
+
+Display real-time data in the stats cards and recent activity sections.
+
+Forms Integration:
+
+Integrate the following forms into the dashboard:
+
+Asset Form: For creating/updating asset records.
+
+Vendor Form: For managing vendor information.
+
+Business Profile Form: For updating business details.
+
+User Invitation Form: For inviting new users.
+
+Use React Hook Form and Zod for form validation and type safety.
+
+Ensure all forms are responsive and use shadcn/ui components for consistent design.
+
+UI Enhancements:
+
+Add accordion-based sections for complex forms (e.g., Asset Form with collapsible sections for Specifications, Assignment & Tracking, and Notes).
+
+Use shadcn/ui Card components for stats cards and recent activity sections.
+
+Add loading states for data fetching and form submissions.
+
+Include error handling for API requests and form validations.
+
+Responsive Design:
+
+Ensure the dashboard is fully responsive and adapts to different screen sizes (mobile, tablet, desktop).
+
+Use Tailwind CSS for utility-first styling and responsive grid layouts.
+
+Tech Stack:
+
+Frontend: React with TypeScript, Tailwind CSS, shadcn/ui.
+
+State Management: Zustand for global state (if needed).
+
+Data Fetching: TanStack Query.
+
+Form Validation: React Hook Form with Zod.
+
+Output:
+
+Provide the complete code for the dashboard, including all components, styles, and API integration.
+
+Ensure the code is clean, modular, and well-documented."
+

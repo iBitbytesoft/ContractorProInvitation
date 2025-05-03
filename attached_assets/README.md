@@ -6,14 +6,7 @@ A modern web application for managing construction contractors, assets, teams, a
 
 - 🔐 **Secure Authentication**: Email/password and Google sign-in options
 - 📊 **Interactive Dashboard**: Real-time statistics and activity tracking
-- 🚛 **Enhanced Asset Management**: 
-  - Comprehensive equipment and tool tracking
-  - Advanced filtering and search capabilities
-  - Real-time data synchronization
-  - Responsive asset form with viewport optimization
-  - View, edit, and delete actions with clear visual indicators
-  - Status tracking with color indicators
-  - Paginated asset listing with customizable page sizes
+- 🚛 **Asset Register**: Comprehensive equipment, tools, and vehicle tracking
 - 👥 **Team Management**: Invite and manage team members with role-based access
 - 📂 **Document Management**: Advanced document upload and categorization system
 - 🏢 **Enhanced Vendor Management**: 

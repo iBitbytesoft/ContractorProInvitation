@@ -1,0 +1,91 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions for common security checks
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function hasUserIdField() {
+      return request.resource.data.userId != null;
+    }
+    
+    function userIdMatches() {
+      return request.resource.data.userId == request.auth.uid;
+    }
+    
+    function isValidDoc() {
+      return isSignedIn() && hasUserIdField() && userIdMatches();
+    }
+    
+    function isAdmin() {
+      return request.auth.token.role == 'admin';
+    }
+    
+    // Assets collection: users can only access their own assets
+    match /assets/{assetId} {
+      allow read: if isSignedIn() && isOwner(resource.data.userId);
+      allow create: if isValidDoc();
+      allow update: if isSignedIn() && isOwner(resource.data.userId) && userIdMatches();
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+    }
+    
+    // Vendors collection: users can only access their own vendor data
+    match /vendors/{vendorId} {
+      allow read: if isSignedIn() && isOwner(resource.data.userId);
+      allow create: if isValidDoc();
+      allow update: if isSignedIn() && isOwner(resource.data.userId) && userIdMatches();
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+    }
+    
+    // Team/Users collection: admins can read all, users can only read their own data
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow create: if isSignedIn() && isAdmin();
+      allow update: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow delete: if isSignedIn() && isAdmin();
+    }
+    
+    // Team collection: for team invitations and management
+    match /team/{memberId} {
+      allow read: if isSignedIn() && (isOwner(resource.data.userId) || isAdmin());
+      allow create: if isSignedIn() && isAdmin();
+      allow update: if isSignedIn() && (isOwner(resource.data.userId) || isAdmin());
+      allow delete: if isSignedIn() && isAdmin();
+    }
+    
+    // Documents collection: users can only access their own documents
+    match /documents/{documentId} {
+      allow read: if isSignedIn() && isOwner(resource.data.userId);
+      allow create: if isValidDoc();
+      allow update: if isSignedIn() && isOwner(resource.data.userId) && userIdMatches();
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+    }
+    
+    // Business Profiles collection: users can only access their own business profile
+    match /businessProfiles/{profileId} {
+      allow read: if isSignedIn() && isOwner(resource.data.userId);
+      allow create: if isValidDoc();
+      allow update: if isSignedIn() && isOwner(resource.data.userId) && userIdMatches();
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+    }
+    
+    // Maintenance Logs collection: users can only access their own maintenance logs
+    match /maintenanceLogs/{logId} {
+      allow read: if isSignedIn() && isOwner(resource.data.userId);
+      allow create: if isValidDoc();
+      allow update: if isSignedIn() && isOwner(resource.data.userId) && userIdMatches();
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+    }
+    
+    // Generic catch-all rule - deny access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

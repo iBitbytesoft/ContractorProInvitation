@@ -1,0 +1,53 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Function to check basic user authentication
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Function to check if user owns the path
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Function to validate image file
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*')
+        && request.resource.size < 5 * 1024 * 1024; // 5MB
+    }
+    
+    // Function to validate document file
+    function isValidDocument() {
+      return request.resource.size < 20 * 1024 * 1024; // 20MB
+    }
+
+    // Allow read access to authenticated users
+    match /{allPaths=**} {
+      allow read: if isAuthenticated();
+    }
+
+    // Allow authenticated users to upload and manage their logo files
+    match /logos/{userId}/{fileName} {
+      allow write: if isAuthenticated() 
+                  && isOwner(userId)
+                  && isValidImage();
+    }
+    
+    // Allow authenticated users to upload and manage their asset images
+    match /assets/{userId}/{fileName} {
+      allow write: if isAuthenticated() 
+                  && isOwner(userId)
+                  && isValidImage();
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+    
+    // Allow authenticated users to upload and manage their document files
+    match /documents/{userId}/{fileName} {
+      allow write: if isAuthenticated() 
+                  && isOwner(userId)
+                  && isValidDocument();
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+  }
+}

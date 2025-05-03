@@ -1,0 +1,182 @@
+Objective:
+Develop a React component (UploadDocumentForm.tsx) for the ContractorPro application that allows users to upload new documents. The form should include file validation, document categorization, and integration with the backend document management system.
+
+Requirements:
+
+Form Structure:
+
+Document Information:
+
+Document Name (required text input)
+
+Category (select: Unallocated, Assets, Vendors, Team, Business Profile)
+
+Description (textarea)
+
+File Upload:
+
+Document File (required file upload)
+
+Functionality:
+
+File validation to ensure the file is of an acceptable type and size.
+
+Document categorization for better organization.
+
+Integration with backend document management system for storing and retrieving documents.
+
+Common Form Functionality:
+
+Reactive form validation using React Hook Form.
+
+Schema validation using Zod.
+
+Controlled inputs with consistent UI components.
+
+Error message display for validation errors.
+
+Responsive layout using grid systems.
+
+Form state management (loading, success, error states).
+
+Submission handling with backend integration.
+
+UI Components:
+
+Use a consistent UI component system built with shadcn/ui.
+
+Reusable FormField, FormItem, FormLabel, FormControl, and FormMessage components for a cohesive user experience.
+
+Deliverables:
+
+A fully functional UploadDocumentForm.tsx React component.
+
+Integration with Zod for form validation.
+
+Proper TypeScript interfaces/types for form data.
+
+Styling to match the existing ContractorPro UI.
+
+Example Code Structure:
+
+tsx
+Copy
+import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'shadcn/ui/dialog';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from 'shadcn/ui/form';
+import { Input } from 'shadcn/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'shadcn/ui/select';
+import { Textarea } from 'shadcn/ui/textarea';
+import { Button } from 'shadcn/ui/button';
+
+const schema = z.object({
+  documentName: z.string().min(1, { message: 'Document Name is required' }),
+  category: z.enum(['Unallocated', 'Assets', 'Vendors', 'Team', 'Business Profile']),
+  description: z.string().optional(),
+  file: z.instanceof(File).refine(file => file.size <= 5 * 1024 * 1024, { message: 'File size must be less than 5MB' }),
+});
+
+const UploadDocumentForm = ({ isOpen, onClose, onSubmit }) => {
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      documentName: '',
+      category: 'Unallocated',
+      description: '',
+      file: null,
+    },
+  });
+
+  const handleFormSubmit = (data) => {
+    onSubmit(data);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Upload New Document</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
+          <FormField
+            control={control}
+            name="documentName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Document Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage>{errors.documentName?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Unallocated">Unallocated</SelectItem>
+                      <SelectItem value="Assets">Assets</SelectItem>
+                      <SelectItem value="Vendors">Vendors</SelectItem>
+                      <SelectItem value="Team">Team</SelectItem>
+                      <SelectItem value="Business Profile">Business Profile</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage>{errors.category?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage>{errors.description?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="file"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Document File</FormLabel>
+                <FormControl>
+                  <Input type="file" onChange={(e) => field.onChange(e.target.files[0])} />
+                </FormControl>
+                <FormMessage>{errors.file?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Upload Document</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default UploadDocumentForm;
+Next Steps:
+
+Implement the form fields and validation as per the requirements.
+
+Ensure the form integrates seamlessly with the existing application.
+
+Test the form thoroughly for usability and functionality.
+

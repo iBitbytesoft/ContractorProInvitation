@@ -1,0 +1,29 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+firestore.ts:100 Error fetching recent assets: FirebaseError: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/buildertrack-e334f/firestore/indexes?create_composite=ClFwcm9qZWN0cy9idWlsZGVydHJhY2stZTMzNGYvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL2Fzc2V0cy9pbmRleGVzL18QARoKCgZ1c2VySWQQARoNCgljcmVhdGVkQXQQAhoMCghfX25hbWVfXxAC
+getRecentAssets @ firestore.ts:100Understand this errorAI
+firestore.ts:426 Error fetching recent documents: FirebaseError: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/buildertrack-e334f/firestore/indexes?create_composite=ClRwcm9qZWN0cy9idWlsZGVydHJhY2stZTMzNGYvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL2RvY3VtZW50cy9pbmRleGVzL18QARoKCgZ1c2VySWQQARoNCgljcmVhdGVkQXQQAhoMCghfX25hbWVfXxAC
+getRecentDocuments @ firestore.ts:426Understand this errorAI
+api.ts:20 Making GET request to business-profiles with auth token
+BusinessProfileForm.tsx:52 Starting save with data: Object
+BusinessProfileForm.tsx:57 Uploading new logo file: OFS - TLS Logo.png
+storage-utils.ts:21 Starting file upload: Object
+business-profile:1 Access to XMLHttpRequest at 'https://firebasestorage.googleapis.com/v0/b/buildertrack-e334f.appspot.com/o?name=logos%2FGpkpGQpBL2dvlCPBfnrHeSAYbpG2%2F1741646320952_OFS_-_TLS_Logo.png' from origin 'https://5c8fd383-710a-4376-840d-e644c7c90475-00-100a6geztcssc.spock.replit.dev' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.Understand this errorAI
+firebasestorage.googleapis.com/v0/b/buildertrack-e334f.appspot.com/o?name=logos%2FGpkpGQpBL2dvlCPBfnrHeSAYbpG2%2F1741646320952_OFS_-_TLS_Logo.png:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this errorAI
+business-profile:1 Access to XMLHttpRequest at 'https://firebasestorage.googleapis.com/v0/b/buildertrack-e334f.appspot.com/o?name=logos%2FGpkpGQpBL2dvlCPBfnrHeSAYbpG2%2F1741646320952_OFS_-_TLS_Logo.png' from origin 'https://5c8fd383-710a-4376-840d-e644c7c90475-00-100a6geztcssc.spock.replit.dev' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.Understand this errorAI
+firebasestorage.googleapis.com/v0/b/buildertrack-e334f.appspot.com/o?name=logos%2FGpkpGQpBL2dvlCPBfnrHeSAYbpG2%2F1741646320952_OFS_-_TLS_Logo.png:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this errorAI
+business-profile:1 Access to XMLHttpRequest at 'https://firebasestorage.googleapis.com/v0/b/buildertrack-e334f.appspot.com/o?name=logos%2FGpkpGQpBL2dvlCPBfnrHeSAYbpG2%2F1741646320952_OFS_-_TLS_Logo.png' from origin 'https://5c8fd383-710a-4376-840d-e644c7c90475-00-100a6geztcssc.spock.replit.dev' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.Understand this errorAI
+firebasestorage.googleapis.com/v0/b/buildertrack-e334f.appspot.com/o?name=logos%2FGpkpGQpBL2dvlCPBfnrHeSAYbpG2%2F1741646320952_OFS_-_TLS_Logo.png:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this errorAI
+business-profile:1 Access to XMLHttpRequest at 'https://firebasestorage.googleapis.com/v0/b/buildertrack-e334f.appspot.com/o?name=logos%2FGpkpGQpBL2dvlCPBfnrHeSAYbpG2%2F1741646320952_OFS_-_TLS_Logo.png' from origin 'https://5c8fd383-710a-4376-840d-e644c7c90475-00-100a6geztcssc.spock.replit.dev' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.Understand this errorAI
+firebase_storage.js?v=37a61f14:1491 
+            
+            
+           POST https://firebasestorage.googleapis.com/v0/b/buildertrack-e334f.appspot.com/o?name=logos%2FGpkpGQpBL2dvlCPBfnrHeSAYbpG2%2F1741646320952_OFS_-_TLS_Logo.png net::ERR_FAILED

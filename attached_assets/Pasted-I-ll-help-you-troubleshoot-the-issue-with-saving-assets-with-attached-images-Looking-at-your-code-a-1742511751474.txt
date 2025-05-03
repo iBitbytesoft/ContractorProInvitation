@@ -1,0 +1,124 @@
+I'll help you troubleshoot the issue with saving assets with attached images. Looking at your code and rules, I can see the problem might be in how the image upload and Firestore saving are coordinated.
+
+Based on the information you've shared, here's what might be happening:
+
+1. Your form is working correctly when no image is added (direct save to Firestore)
+2. When an image is uploaded, something is failing in the process of:
+   - Uploading the image to Firebase Storage
+   - Getting the URL of the uploaded image
+   - Including that URL in the Firestore document
+   - Completing the save operation
+
+Let me suggest a solution that should fix this issue:
+
+```javascript
+// Image upload helper function
+const uploadImage = async (file, userId) => {
+  if (!file) return null;
+  
+  // Create a unique filename
+  const fileName = `${new Date().getTime()}_${file.name}`;
+  const storageRef = ref(storage, `logos/${userId}/${fileName}`);
+  
+  try {
+    // Upload the file
+    const uploadTask = await uploadBytes(storageRef, file);
+    // Get download URL
+    const downloadURL = await getDownloadURL(uploadTask.ref);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw error;
+  }
+};
+
+// Modified save function
+const saveAsset = async (assetData, imageFile) => {
+  try {
+    // Show loading state
+    setIsSubmitting(true);
+    
+    let finalAssetData = { ...assetData };
+    
+    // If there's an image file, upload it first
+    if (imageFile) {
+      const userId = auth.currentUser.uid;
+      const imageUrl = await uploadImage(imageFile, userId);
+      
+      // Add the image URL to the asset data
+      if (imageUrl) {
+        finalAssetData.imageUrl = imageUrl;
+      }
+    }
+    
+    // Now save the complete asset data (with image URL if uploaded) to Firestore
+    const assetRef = doc(collection(db, 'assets'));
+    await setDoc(assetRef, {
+      ...finalAssetData,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      userId: auth.currentUser.uid
+    });
+    
+    // Reset form and close dialog
+    resetForm();
+    closeDialog();
+    
+    // Show success notification
+    toast.success('Asset added successfully');
+  } catch (error) {
+    console.error("Error saving asset:", error);
+    toast.error('Failed to add asset');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+// In your form submission handler
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Basic form validation
+  if (!assetData.assetName || !assetData.type) {
+    toast.error('Please fill in all required fields');
+    return;
+  }
+  
+  // Get the image file from your form (adjust based on your form structure)
+  const imageFile = formRef.current.elements.imageUpload.files[0];
+  
+  // Call the saveAsset function with both asset data and image file
+  await saveAsset(assetData, imageFile);
+};
+```
+
+Make sure your form includes an input for the image:
+
+```jsx
+<input 
+  type="file" 
+  name="imageUpload" 
+  accept="image/*" 
+  onChange={handleImageChange} // Optional handler to preview the image
+/>
+```
+
+Also, verify that your Firebase setup includes both Firestore and Storage:
+
+```javascript
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirestore, doc, setDoc, collection, serverTimestamp } from "firebase/firestore";
+
+// Initialize services
+const db = getFirestore(app);
+const storage = getStorage(app);
+```
+
+The key points in this solution:
+1. Separate the image upload from the data saving
+2. Upload the image first, get its URL
+3. Then include that URL in the Firestore document data
+4. Use try/catch to properly handle errors
+5. Make sure the Firebase Storage rules are correctly set up (which yours appear to be)
+
+This should fix your issue with saving assets that have attached images while maintaining all existing functionality.

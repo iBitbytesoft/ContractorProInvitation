@@ -1,0 +1,87 @@
+Create a professional, fully designed dual-purpose login/landing page with a split design layout. The page should serve as both a landing page for new visitors and a login page for returning users. Use a modern and cohesive color palette, and ensure the design is responsive and visually appealing. Follow these requirements:
+
+Split Design Layout:
+
+Left Side: A visually striking section for the landing page content.
+
+Right Side: A clean and minimal login/signup form.
+
+Color Palette:
+
+Primary Color: A vibrant yet professional color (e.g., #2563EB for a modern blue).
+
+Secondary Color: A complementary color (e.g., #1E40AF for a darker shade).
+
+Background: A light or dark neutral color (e.g., #F9FAFB for light mode or #1F2937 for dark mode).
+
+Accent Colors: Use sparingly for buttons and highlights (e.g., #10B981 for green accents).
+
+Left Side (Landing Page Content):
+
+Include a catchy headline (e.g., 'Manage Your Construction Assets with Ease').
+
+Add a short description (e.g., 'Streamline your vendor and asset management with our powerful tools').
+
+Use a high-quality, relevant image or illustration (e.g., construction equipment or tools).
+
+Add a call-to-action button (e.g., 'Get Started').
+
+Right Side (Login/Signup Form):
+
+Include a toggle switch to switch between Login and Signup forms.
+
+Login Form Fields:
+
+Email input field.
+
+Password input field.
+
+'Forgot Password?' link.
+
+'Login' button.
+
+Signup Form Fields:
+
+Name input field.
+
+Email input field.
+
+Password input field.
+
+Confirm Password input field.
+
+'Sign Up' button.
+
+Add social login buttons (e.g., 'Continue with Google').
+
+Responsive Design:
+
+Ensure the layout adjusts seamlessly for mobile and tablet screens.
+
+Stack the left and right sections vertically on smaller screens.
+
+Typography:
+
+Use a modern sans-serif font (e.g., 'Inter' or 'Poppins').
+
+Set appropriate font sizes for headings, body text, and form labels.
+
+Additional Features:
+
+Add a dark mode/light mode toggle button.
+
+Include subtle animations or transitions for hover effects on buttons and links.
+
+Tech Stack:
+
+Use React with TypeScript for the frontend.
+
+Style the page using Tailwind CSS for utility-first styling.
+
+Use shadcn/ui components for consistent and professional UI elements.
+
+Output:
+
+Provide the complete code for the page, including all necessary components, styles, and assets.
+
+Ensure the code is clean, modular, and well-documented.

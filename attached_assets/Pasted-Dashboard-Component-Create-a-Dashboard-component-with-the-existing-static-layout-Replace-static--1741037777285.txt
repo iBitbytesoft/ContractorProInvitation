@@ -1,0 +1,126 @@
+Dashboard Component:
+
+Create a Dashboard component with the existing static layout.
+
+Replace static data with dynamic data fetched using TanStack Query.
+
+Stats Cards:
+
+Create a StatsCard component to display key metrics.
+
+Use shadcn/ui Card components for consistent design.
+
+Recent Activity Section:
+
+Create a RecentActivity component to display recent vendors and assets.
+
+Use a responsive grid layout for the recent activity cards.
+
+Forms Integration:
+
+Create separate components for each form (AssetForm.tsx, VendorForm.tsx, etc.).
+
+Use React Hook Form and Zod for form validation.
+
+Ensure all forms are integrated into the dashboard with proper routing.
+
+API Integration:
+
+Set up API endpoints in the backend for fetching vendors, assets, and other data.
+
+Use TanStack Query to fetch and display data in the dashboard.
+
+Responsive Design:
+
+Use Tailwind CSS utilities to ensure the dashboard is fully responsive.
+
+Test the layout on different screen sizes.
+
+Error Handling:
+
+Add error boundaries and loading states for API requests.
+
+Display error messages for form validation and API errors.
+
+Example Code Snippets for Replit AI:
+Stats Card Component:
+
+tsx
+Copy
+import { Card } from "@/components/ui/card";
+
+interface StatsCardProps {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+}
+
+export const StatsCard = ({ title, value, icon }: StatsCardProps) => {
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-4">
+        {icon}
+        <div>
+          <p className="text-sm text-gray-500">{title}</p>
+          <p className="text-2xl font-bold">{value}</p>
+        </div>
+      </div>
+    </Card>
+  );
+};
+Recent Activity Component:
+
+tsx
+Copy
+import { Card } from "@/components/ui/card";
+
+interface RecentActivityProps {
+  vendors: { companyName: string; contactName: string }[];
+  assets: { assetName: string; location: string }[];
+}
+
+export const RecentActivity = ({ vendors, assets }: RecentActivityProps) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Card className="p-4">
+        <h3 className="font-semibold mb-4">Recent Vendors</h3>
+        <ul>
+          {vendors.map((vendor, index) => (
+            <li key={index} className="text-sm">
+              {vendor.companyName} - {vendor.contactName}
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Card className="p-4">
+        <h3 className="font-semibold mb-4">Recent Assets</h3>
+        <ul>
+          {assets.map((asset, index) => (
+            <li key={index} className="text-sm">
+              {asset.assetName} - {asset.location}
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </div>
+  );
+};
+TanStack Query Example:
+
+tsx
+Copy
+import { useQuery } from "@tanstack/react-query";
+import { fetchVendors, fetchAssets } from "@/api";
+
+const Dashboard = () => {
+  const { data: vendors } = useQuery({ queryKey: ["vendors"], queryFn: fetchVendors });
+  const { data: assets } = useQuery({ queryKey: ["assets"], queryFn: fetchAssets });
+
+  return (
+    <div>
+      <StatsCard title="Total Vendors" value={vendors?.length || 0} icon={<Building2Icon />} />
+      <StatsCard title="Total Assets" value={assets?.length || 0} icon={<WrenchIcon />} />
+      <RecentActivity vendors={vendors} assets={assets} />
+    </div>
+  );
+};
