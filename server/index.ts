@@ -10,7 +10,10 @@ const app = express();
 // Basic middleware setup
 app.use(
   cors({
-    origin: "http://localhost:5001",
+    origin:
+      process.env.NODE_ENV === "production"
+        ? true // Allow all origins in production
+        : "http://localhost:5001",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
