@@ -26,31 +26,41 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// API routes
-app.use("/api", registerRoutes(app));
+// API routes registration (synchronous)
+registerRoutes(app);
 
+// Static file serving and client-side routing
 if (process.env.NODE_ENV === "production") {
   const publicPath = path.join(__dirname, "..", "public");
 
   // Serve static files
   app.use(express.static(publicPath));
 
-  // Serve index.html for all non-API routes (SPA fallback)
-  app.get("*", (req, res) => {
+  // SPA fallback - must come after API routes
+  app.get("*", (req, res, next) => {
     if (!req.path.startsWith("/api")) {
-      res.sendFile(path.join(publicPath, "index.html"));
+      const indexPath = path.join(publicPath, "index.html");
+      res.sendFile(indexPath, (err) => {
+        if (err) {
+          console.error("Error serving index.html:", err);
+          next(err);
+        }
+      });
+    } else {
+      next();
     }
   });
 } else {
-  // Development setup with Vite
-  const server = await import("http").then(({ createServer }) => createServer(app));
+  // Development setup
+  const { createServer } = await import("http");
+  const server = createServer(app);
   await setupVite(app, server);
 }
 
 // Error handling
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err);
-  res.status(500).json({ error: "Internal Server Error" });
+  console.error("Server error:", err);
+  res.status(500).json({ error: "Internal Server Error", details: err.message });
 });
 
 const PORT = process.env.PORT || 5000;

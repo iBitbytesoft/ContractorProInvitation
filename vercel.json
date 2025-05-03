@@ -2,26 +2,28 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": null,
+  "installCommand": "npm install",
+  "env": {
+    "VITE_FIREBASE_API_KEY": "@vite_firebase_api_key",
+    "VITE_FIREBASE_PROJECT_ID": "@vite_firebase_project_id",
+    "VITE_FIREBASE_APP_ID": "@vite_firebase_app_id",
+    "FIREBASE_CLIENT_EMAIL": "@firebase_client_email",
+    "FIREBASE_PRIVATE_KEY": "@firebase_private_key"
+  },
   "builds": [
     {
-      "src": "package.json",
+      "src": "dist/server/index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/dist/server/index.js"
+      "dest": "dist/server/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/public/$1",
-      "continue": true
-    },
-    {
-      "src": "/[^.]+",
-      "dest": "/dist/public/index.html"
+      "dest": "dist/public/$1"
     }
   ]
 }

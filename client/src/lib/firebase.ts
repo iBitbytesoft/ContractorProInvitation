@@ -15,28 +15,47 @@ import {
 } from "firebase/firestore";
 import type { Asset, Vendor, Document, BusinessProfile } from "./types";
 
+// Ensure all required environment variables are present
+const requiredEnvVars = [
+  "VITE_FIREBASE_API_KEY",
+  "VITE_FIREBASE_PROJECT_ID",
+  "VITE_FIREBASE_APP_ID",
+];
+
+for (const envVar of requiredEnvVars) {
+  if (!import.meta.env[envVar]) {
+    console.error(`Missing required environment variable: ${envVar}`);
+    throw new Error(`Missing required environment variable: ${envVar}`);
+  }
+}
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: `${
-    import.meta.env.VITE_FIREBASE_PROJECT_ID
-  }.firebasestorage.app`,
+  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+console.log("Initializing Firebase with config:", {
+  ...firebaseConfig,
+  apiKey: firebaseConfig.apiKey ? "********************" : undefined,
+});
+
 // Initialize Firebase instances with proper typing
-const app = initializeApp(firebaseConfig);
+let app;
+try {
+  app = initializeApp(firebaseConfig);
+  console.log("Firebase client SDK initialized successfully");
+} catch (error: any) {
+  console.error("Error initializing Firebase:", error.message);
+  throw error;
+}
+
 const auth: Auth = getAuth(app);
 const storage = getStorage(app);
 const db: Firestore = getFirestore(app);
-
-try {
-  console.log("Firebase client SDK initialized successfully");
-} catch (error) {
-  console.error("Error initializing Firebase client SDK:", error);
-  throw error;
-}
 
 // Export Firebase instances
 export { app, auth, storage, db };

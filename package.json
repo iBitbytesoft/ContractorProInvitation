@@ -5,11 +5,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "npm run build:client && npm run build:server && npm run verify-build",
+    "build": "node scripts/validate-env.js && npm run build:client && npm run build:server && npm run verify-static",
     "build:client": "vite build",
     "build:server": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist/server",
     "start": "cross-env NODE_ENV=production node dist/server/index.js",
-    "verify-build": "node scripts/verify-build.js",
+    "verify-static": "node scripts/verify-static.js",
     "check": "tsc",
     "db:push": "drizzle-kit push"
   },
