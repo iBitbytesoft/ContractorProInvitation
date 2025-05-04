@@ -335,6 +335,10 @@ export default function Team() {
   const LoadingDialog = () => (
     <Dialog open={loading}>
       <DialogContent className="flex flex-col items-center justify-center">
+        <DialogHeader>
+          <DialogTitle>Processing Invitation</DialogTitle>
+          <DialogDescription>Please wait while we process your invitation request.</DialogDescription>
+        </DialogHeader>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
         <p className="text-center text-lg font-medium">
           Processing invitation...

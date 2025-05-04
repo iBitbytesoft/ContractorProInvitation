@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader } from '@/components/ui/dialog';
 import {
   PlusCircle,
   Building2,
@@ -357,9 +357,14 @@ const VendorsPage = () => {
         {/* View/Edit Vendor Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="max-w-3xl">
-            <DialogTitle>
-              {selectedVendor && mode === 'edit' ? `Edit ${selectedVendor.companyName}` : 'Vendor Details'}
-            </DialogTitle>
+            <DialogHeader>
+              <DialogTitle>
+                {selectedVendor && mode === 'edit' ? `Edit ${selectedVendor.companyName}` : 'Vendor Details'}
+              </DialogTitle>
+              <DialogDescription>
+                {mode === 'edit' ? 'Make changes to the vendor information below.' : 'View vendor details and information.'}
+              </DialogDescription>
+            </DialogHeader>
             {mode === 'edit' ? (
               <VendorForm
                 vendor={selectedVendor}
@@ -375,7 +380,12 @@ const VendorsPage = () => {
         {/* Add Vendor Dialog */}
         <Dialog open={isAddVendorDialogOpen} onOpenChange={setIsAddVendorDialogOpen}>
           <DialogContent className="max-w-3xl">
-            <DialogTitle>Add New Vendor</DialogTitle>
+            <DialogHeader>
+              <DialogTitle>Add New Vendor</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to add a new vendor to your system.
+              </DialogDescription>
+            </DialogHeader>
             <VendorForm
               mode="create"
               onClose={() => setIsAddVendorDialogOpen(false)}
