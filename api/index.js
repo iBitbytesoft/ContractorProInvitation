@@ -16,9 +16,38 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Add path rewriting middleware to handle /api prefix
+app.use((req, res, next) => {
+  console.log(`Original request path: ${req.url}`);
+  
+  // Handle both /api/team and /team patterns
+  if (req.url.startsWith('/api/')) {
+    req.url = req.url.replace(/^\/api/, '');
+    console.log(`Rewritten request path: ${req.url}`);
+  }
+  
+  next();
+});
+
 // Simple health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV });
+});
+
+// Root endpoint for API testing
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    message: "API is running",
+    endpoints: ["/health", "/team", "/stats", "/assets", "/vendors", "/send-email"]
+  });
+});
+
+// Handle both /api/team and /team patterns
+app.get('/api/team', async (req, res) => {
+  console.log("Direct /api/team endpoint called");
+  // Forward to the team handler
+  req.url = '/team';
+  app.handle(req, res);
 });
 
 // =================================================================
@@ -188,9 +217,24 @@ export default function handler(req, res) {
   // Log the request for debugging
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   
-  // Extract the actual path from the URL (needed for Vercel serverless)
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  console.log(`Processing request for path: ${url.pathname}`);
+  try {
+    // Extract the actual path from the URL (needed for Vercel serverless)
+    let url;
+    if (req.url) {
+      if (req.url.startsWith('/')) {
+        // URL is already a path, no need to parse
+        console.log(`Processing direct path: ${req.url}`);
+      } else {
+        // Parse URL to extract the path
+        url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+        console.log(`Parsed URL path: ${url.pathname}`);
+        // Update req.url to use the parsed pathname
+        req.url = url.pathname;
+      }
+    }
+  } catch (error) {
+    console.error(`Error processing request URL: ${req.url}`, error);
+  }
   
   // Pass the request to the Express app
   return app(req, res);
