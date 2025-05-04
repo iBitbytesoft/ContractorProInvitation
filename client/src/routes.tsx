@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Route, Router, Switch } from "wouter";
 import DashboardPage from "./pages/dashboard";
@@ -31,6 +30,7 @@ export function AppRoutes() {
           {isAuthenticated ? <DashboardPage /> : <LoginPage />}
         </Route>
         
+        {/* Root route - Show login page if not authenticated, dashboard if authenticated */}
         <Route path="/">
           {isAuthenticated ? (
             <Layout>
@@ -41,6 +41,7 @@ export function AppRoutes() {
           )}
         </Route>
         
+        {/* Dashboard route */}
         <Route path="/dashboard">
           {isAuthenticated ? (
             <Layout>
@@ -51,6 +52,7 @@ export function AppRoutes() {
           )}
         </Route>
         
+        {/* Vendors route */}
         <Route path="/vendors">
           {isAuthenticated ? (
             <Layout>
