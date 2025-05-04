@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Route, Router, Switch } from "wouter";
+import { Route, Router, Switch, Redirect } from "wouter";
 import DashboardPage from "./pages/dashboard";
 import VendorsPage from "./pages/vendors";
 import LoginPage from "./pages/login";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import Layout from "./components/layout/Layout";
+import Layout from "./components/Layout";
 
 export function AppRoutes() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -13,6 +13,7 @@ export function AppRoutes() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
+      console.log("Authentication state changed:", !!user); // Debug log
     });
 
     return () => unsubscribe();
@@ -27,15 +28,13 @@ export function AppRoutes() {
     <Router>
       <Switch>
         <Route path="/login">
-          {isAuthenticated ? <DashboardPage /> : <LoginPage />}
+          {isAuthenticated ? <Redirect to="/dashboard" /> : <LoginPage />}
         </Route>
         
         {/* Root route - Show login page if not authenticated, dashboard if authenticated */}
         <Route path="/">
           {isAuthenticated ? (
-            <Layout>
-              <DashboardPage />
-            </Layout>
+            <Redirect to="/dashboard" />
           ) : (
             <LoginPage />
           )}
@@ -63,7 +62,10 @@ export function AppRoutes() {
           )}
         </Route>
         
-        {/* Add more authenticated routes as needed */}
+        {/* Fallback - redirect to login for any unknown route */}
+        <Route>
+          <LoginPage />
+        </Route>
       </Switch>
     </Router>
   );
