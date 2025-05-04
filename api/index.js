@@ -16,34 +16,68 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Special middleware to handle Vercel serverless path rewriting
+app.use((req, res, next) => {
+  // Log the original request path
+  console.log(`Original request path: ${req.url}`);
+  
+  // If the request is coming from Vercel's API path rewriting
+  if (req.url.startsWith('/api/') && req.url !== '/api/') {
+    // Remove the /api prefix from the path
+    req.url = req.url.replace(/^\/api/, '');
+    console.log(`Rewritten request path: ${req.url}`);
+  }
+  
+  next();
+});
+
 // Simple health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV });
+});
+
+// Root endpoint to debug routing
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    message: "API is running",
+    endpoints: ["/health", "/team", "/stats", "/assets", "/vendors", "/send-email"] 
+  });
 });
 
 // =================================================================
 // API ROUTES
 // =================================================================
 
-// Get dashboard stats
-app.get('/stats', async (req, res) => {
+// Explicitly handle /api/team as well (for direct access)
+app.get('/api/team', async (req, res) => {
+  console.log("Direct /api/team endpoint called");
+  
   try {
-    const [assets, vendors, team, documents] = await Promise.all([
-      adminDb.collection("assets").count().get(),
-      adminDb.collection("vendors").count().get(),
-      adminDb.collection("users").count().get(),
-      adminDb.collection("documents").count().get(),
-    ]);
-
-    res.json({
-      assets: assets.data().count,
-      vendors: vendors.data().count,
-      team: team.data().count,
-      documents: documents.data().count,
-    });
+    // Same logic as the /team endpoint below
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: "Unauthorized - No valid token" });
+    }
+    
+    const token = authHeader.split('Bearer ')[1];
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    const uid = decodedToken.uid;
+    
+    const teamMembers = [
+      {
+        id: uid,
+        email: decodedToken.email || "user@example.com",
+        displayName: decodedToken.email ? decodedToken.email.split('@')[0] : 'Owner',
+        role: "admin",
+        isOwner: true
+      }
+    ];
+    
+    // Return a simple response for now
+    res.json(teamMembers);
   } catch (error) {
-    console.error("Error fetching stats:", error);
-    res.status(500).json({ message: "Failed to fetch stats" });
+    console.error("Error in /api/team endpoint:", error);
+    res.status(500).json({ message: "Failed to fetch team members" });
   }
 });
 
@@ -111,6 +145,28 @@ app.get('/team', async (req, res) => {
   } catch (error) {
     console.error("Error fetching team members:", error);
     res.status(500).json({ message: "Failed to fetch team members" });
+  }
+});
+
+// Get dashboard stats
+app.get('/stats', async (req, res) => {
+  try {
+    const [assets, vendors, team, documents] = await Promise.all([
+      adminDb.collection("assets").count().get(),
+      adminDb.collection("vendors").count().get(),
+      adminDb.collection("users").count().get(),
+      adminDb.collection("documents").count().get(),
+    ]);
+
+    res.json({
+      assets: assets.data().count,
+      vendors: vendors.data().count,
+      team: team.data().count,
+      documents: documents.data().count,
+    });
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    res.status(500).json({ message: "Failed to fetch stats" });
   }
 });
 
@@ -188,9 +244,14 @@ export default function handler(req, res) {
   // Log the request for debugging
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   
-  // Extract the actual path from the URL (needed for Vercel serverless)
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  console.log(`Processing request for path: ${url.pathname}`);
+  // Ensure the URL object can be created from the request
+  let url;
+  try {
+    url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    console.log(`Processing request for path: ${url.pathname}`);
+  } catch (error) {
+    console.error(`Error parsing URL from ${req.url}:`, error);
+  }
   
   // Pass the request to the Express app
   return app(req, res);
