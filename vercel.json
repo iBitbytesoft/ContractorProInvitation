@@ -10,23 +10,8 @@
     "FIREBASE_CLIENT_EMAIL": "@firebase_client_email",
     "FIREBASE_PRIVATE_KEY": "@firebase_private_key"
   },
-  "builds": [
-    {
-      "src": "dist/server/index.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "dist/server/index.js"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/public/index.html"
-    }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/dist/public/index.html" }
   ]
 }
