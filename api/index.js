@@ -210,6 +210,14 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
+// Add explicit handler for /api/send-email (for direct access)
+app.post('/api/send-email', async (req, res) => {
+  console.log("Direct /api/send-email endpoint called");
+  // Forward to the send-email handler
+  req.url = '/send-email';
+  app.handle(req, res);
+});
+
 // Add more API endpoints here as needed...
 
 // Serverless function handler
