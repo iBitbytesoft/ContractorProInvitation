@@ -17,8 +17,11 @@
       "dest": "/api/index.js"
     },
     {
-      "src": "/(.*\\.[a-z0-9]{1,10}$)",
-      "dest": "/$1"
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
