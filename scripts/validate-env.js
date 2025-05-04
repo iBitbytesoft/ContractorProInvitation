@@ -1,4 +1,7 @@
 // Validate required environment variables
+// Load environment variables from .env file
+import 'dotenv/config';
+
 const requiredEnvVars = [
   'VITE_FIREBASE_API_KEY',
   'VITE_FIREBASE_PROJECT_ID',
