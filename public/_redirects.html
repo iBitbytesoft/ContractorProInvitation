@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ContractorPro - Loading...</title>
+    <script>
+      // Single Page App redirect script
+      // Handles routing when users access direct URLs or refresh pages
+      (function() {
+        // Redirect all routes to the index.html file
+        // This allows the client-side router to handle the route
+        const segment = window.location.pathname.split('/')[1];
+        if (!segment.includes('.')) {
+          window.location.replace('/');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Loading ContractorPro...</p>
+  </body>
+</html>
