@@ -12,13 +12,21 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins for development
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all methods
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id']
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Add path rewriting middleware to handle /api prefix
+// Add detailed request logging
 app.use((req, res, next) => {
-  console.log(`Original request path: ${req.url}`);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log('Headers:', JSON.stringify(req.headers));
+  if (req.method === 'POST') {
+    console.log('Request body:', JSON.stringify(req.body));
+  }
   
   // Handle both /api/team and /team patterns
   if (req.url.startsWith('/api/')) {
@@ -41,6 +49,42 @@ app.get('/', (req, res) => {
     endpoints: ["/health", "/team", "/stats", "/assets", "/vendors", "/send-email"]
   });
 });
+
+// Add OPTIONS handler for preflight requests
+app.options('*', cors());
+
+// Handle send-email endpoint with both /api and non-api prefix
+app.post('/send-email', handleSendEmail);
+app.post('/api/send-email', handleSendEmail);
+
+// Send email handler function
+async function handleSendEmail(req, res) {
+  try {
+    console.log("Received email request:", req.body);
+    
+    // For debugging, log everything about the request
+    console.log("Request method:", req.method);
+    console.log("Request URL:", req.url);
+    console.log("Request path:", req.path);
+    console.log("Request query:", req.query);
+    console.log("Request headers:", req.headers);
+    
+    // Here you would typically integrate with an email service
+    // For now, we'll just return success to make the frontend happy
+    res.status(200).json({ 
+      success: true, 
+      message: "Email request received and processed successfully",
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Error handling email request:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to process email request", 
+      error: error.message 
+    });
+  }
+}
 
 // Handle both /api/team and /team patterns
 app.get('/api/team', async (req, res) => {
@@ -193,37 +237,12 @@ app.get('/vendors', async (req, res) => {
   }
 });
 
-// Send email endpoint
-app.post('/send-email', async (req, res) => {
-  try {
-    console.log("Received email request:", req.body);
-    
-    // Here you would typically integrate with an email service
-    // For now, we'll just return success to make the frontend happy
-    res.status(200).json({ 
-      success: true, 
-      message: "Email request received (mock implementation)" 
-    });
-  } catch (error) {
-    console.error("Error handling email request:", error);
-    res.status(500).json({ message: "Failed to process email request" });
-  }
-});
-
-// Add explicit handler for /api/send-email (for direct access)
-app.post('/api/send-email', async (req, res) => {
-  console.log("Direct /api/send-email endpoint called");
-  // Forward to the send-email handler
-  req.url = '/send-email';
-  app.handle(req, res);
-});
-
 // Add more API endpoints here as needed...
 
 // Serverless function handler
 export default function handler(req, res) {
   // Log the request for debugging
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log(`[SERVERLESS HANDLER] ${req.method} ${req.url}`);
   
   try {
     // Extract the actual path from the URL (needed for Vercel serverless)
@@ -233,11 +252,21 @@ export default function handler(req, res) {
         // URL is already a path, no need to parse
         console.log(`Processing direct path: ${req.url}`);
       } else {
-        // Parse URL to extract the path
-        url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-        console.log(`Parsed URL path: ${url.pathname}`);
-        // Update req.url to use the parsed pathname
-        req.url = url.pathname;
+        try {
+          // Parse URL to extract the path
+          url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+          console.log(`Parsed URL path: ${url.pathname}`);
+          // Update req.url to use the parsed pathname
+          req.url = url.pathname;
+        } catch (parseError) {
+          console.error("Error parsing URL:", parseError);
+          // If URL parsing fails, try to extract the path directly
+          const match = req.url.match(/^https?:\/\/[^\/]+(\/.*)/);
+          if (match) {
+            req.url = match[1];
+            console.log(`Extracted path from URL: ${req.url}`);
+          }
+        }
       }
     }
   } catch (error) {

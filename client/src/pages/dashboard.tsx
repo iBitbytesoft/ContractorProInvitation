@@ -606,7 +606,7 @@ const Dashboard = () => {
       await addDoc(collection(db, "user_invitations"), invitationData);
       
       // Optionally, send an email to the invited user with a link
-      await fetch("http://localhost:5000/send-email", {
+      await fetch(`${import.meta.env.VITE_BACKEND_URL}/send-email`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
