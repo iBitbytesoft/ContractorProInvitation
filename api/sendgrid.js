@@ -15,7 +15,8 @@ if (!SENDGRID_API_KEY) {
   console.log('SendGrid initialized successfully with API key');
 }
 
-// Set the verified sender email from your SendGrid account
+// Set the verified sender email - MUST BE VERIFIED IN SENDGRID DASHBOARD
+// This should be an email you have verified in your SendGrid account
 const VERIFIED_SENDER = process.env.VERIFIED_SENDER || "baqar.falconit@gmail.com";
 
 /**
@@ -39,18 +40,26 @@ export const sendEmail = async (emailData) => {
       emailData.from = VERIFIED_SENDER;
     }
 
-    console.log('Sending email to:', emailData.to);
-    console.log('Email subject:', emailData.subject);
+    console.log('Preparing to send email with SendGrid:');
+    console.log('  - To:', emailData.to);
+    console.log('  - From:', emailData.from);
+    console.log('  - Subject:', emailData.subject);
+    console.log('  - API Key configured:', !!SENDGRID_API_KEY);
     
     // Send the email using SendGrid
-    const response = await sgMail.send(emailData);
-    console.log('Email sent successfully:', response);
-    return response;
-  } catch (error) {
-    console.error('Error sending email with SendGrid:', error);
-    if (error.response) {
-      console.error('SendGrid API error details:', error.response.body);
+    try {
+      const response = await sgMail.send(emailData);
+      console.log('Email sent successfully via SendGrid:', response[0].statusCode);
+      return response;
+    } catch (sgError) {
+      console.error('SendGrid Error:', sgError);
+      if (sgError.response) {
+        console.error('SendGrid API error details:', sgError.response.body);
+      }
+      throw sgError;
     }
+  } catch (error) {
+    console.error('Error in sendEmail function:', error);
     throw error;
   }
 };
