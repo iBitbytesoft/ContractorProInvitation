@@ -264,6 +264,7 @@ export default function Team() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "Authorization": `Bearer ${await auth.currentUser?.getIdToken()}`
             },
             body: JSON.stringify({
               to: data.invitedEmail,

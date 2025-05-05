@@ -66,6 +66,29 @@ async function handleSendEmail(req, res) {
     // Extract email data from the request body
     const { to, subject, text, inviterEmail, invitationLink, role } = req.body;
     
+    // Check authorization
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error("Unauthorized email request - missing or invalid token");
+      return res.status(401).json({ 
+        success: false,
+        message: "Unauthorized"
+      });
+    }
+    
+    // Verify the Firebase token
+    const token = authHeader.split('Bearer ')[1];
+    try {
+      const decodedToken = await adminAuth.verifyIdToken(token);
+      console.log("Authenticated user for email request:", decodedToken.uid);
+    } catch (tokenError) {
+      console.error("Failed to verify token for email request:", tokenError);
+      return res.status(401).json({ 
+        success: false,
+        message: "Unauthorized"
+      });
+    }
+    
     if (!to) {
       return res.status(400).json({ 
         success: false, 
