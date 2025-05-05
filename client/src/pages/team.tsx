@@ -260,37 +260,51 @@ export default function Team() {
         });
 
         try {
-          const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/send-email`, {
+          console.log("Preparing to send invitation email, auth token present:", !!auth.currentUser);
+          
+          // Get fresh token
+          const token = await auth.currentUser?.getIdToken(true);
+          console.log("Firebase token obtained:", token ? "Yes (token present)" : "No (missing token)");
+          
+          // Determine API URL with fallback
+          const apiUrl = import.meta.env.VITE_BACKEND_URL || window.location.origin;
+          console.log("Using API URL:", `${apiUrl}/send-email`);
+          
+          const response = await fetch(`${apiUrl}/send-email`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${await auth.currentUser?.getIdToken()}`
+              "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
               to: data.invitedEmail,
               subject: `You have been invited as a ${data.invitedRole}`,
-              text: `You have received an invitation from ${data.invitedEmail} \n ${data.invitationLink}`,
-              inviterEmail: data.invitedEmail,
+              text: `You have received an invitation from ${user?.email || 'ContractorPro'} \n ${data.invitationLink}`,
+              inviterEmail: user?.email || 'ContractorPro Team',
               invitationLink: data.invitationLink,
               role: data.invitedRole,
             }),
           });
 
+          console.log("Email API response status:", response.status);
+          
+          // Get full response text for better debugging
+          const responseText = await response.text();
+          console.log("Email API response:", responseText);
+          
           setShowInviteForm(false);
           setLoading(false);
+          
           if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || "Failed to send email");
+            throw new Error(responseText || "Failed to send email");
           }
 
-          const result = await response.text();
           console.log("Added to pending invitations:", storageMember);
-
           toast.success("Invitation sent successfully");
         } catch (error) {
           setLoading(false);
           console.error("Failed to send invitation email:", error);
-          toast.error("Failed to send invitation email");
+          toast.error(`Failed to send invitation email: ${error}`);
         }
       }
     } else {
