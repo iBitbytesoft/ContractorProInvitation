@@ -4,6 +4,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import { adminDb, adminAuth } from './firebase-admin.js';
+import { sendEmail, sendInvitationEmail } from './sendgrid.js';
 
 // Load environment variables
 dotenv.config();
@@ -62,20 +63,76 @@ async function handleSendEmail(req, res) {
   try {
     console.log("Received email request:", req.body);
     
-    // For debugging, log everything about the request
-    console.log("Request method:", req.method);
-    console.log("Request URL:", req.url);
-    console.log("Request path:", req.path);
-    console.log("Request query:", req.query);
-    console.log("Request headers:", req.headers);
+    // Extract email data from the request body
+    const { to, subject, text, inviterEmail, invitationLink, role } = req.body;
     
-    // Here you would typically integrate with an email service
-    // For now, we'll just return success to make the frontend happy
-    res.status(200).json({ 
-      success: true, 
-      message: "Email request received and processed successfully",
-      timestamp: new Date().toISOString()
-    });
+    if (!to) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Missing required field: to" 
+      });
+    }
+    
+    // Check if this is an invitation email
+    if (invitationLink && role) {
+      console.log("Sending invitation email to:", to);
+      
+      try {
+        // Use the specialized invitation email function
+        await sendInvitationEmail({
+          to,
+          inviterEmail: inviterEmail || 'ContractorPro Team',
+          invitationLink,
+          role
+        });
+        
+        return res.status(200).json({
+          success: true,
+          message: "Invitation email sent successfully",
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error("Error sending invitation email:", error);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to send invitation email",
+          error: error.message
+        });
+      }
+    } else {
+      // For regular emails
+      if (!subject || !text) {
+        return res.status(400).json({
+          success: false,
+          message: "Missing required fields: subject or text"
+        });
+      }
+      
+      console.log("Sending regular email to:", to);
+      
+      try {
+        // Use the general email function
+        await sendEmail({
+          to,
+          subject,
+          text,
+          html: req.body.html // Optional HTML content
+        });
+        
+        return res.status(200).json({
+          success: true,
+          message: "Email sent successfully",
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error("Error sending regular email:", error);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to send email",
+          error: error.message
+        });
+      }
+    }
   } catch (error) {
     console.error("Error handling email request:", error);
     res.status(500).json({ 
