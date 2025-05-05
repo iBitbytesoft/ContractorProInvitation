@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Initialize SendGrid with your API key
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "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";
 
 if (!SENDGRID_API_KEY) {
   console.warn('SENDGRID_API_KEY is not set in environment variables. Email functionality will not work.');
@@ -17,7 +17,7 @@ if (!SENDGRID_API_KEY) {
 
 // IMPORTANT: This MUST be an email address you've verified in SendGrid
 // Using the verified sender email
-const VERIFIED_SENDER = process.env.VERIFIED_SENDER;
+const VERIFIED_SENDER = process.env.VERIFIED_SENDER || "wamev32521@firain.com";
 
 /**
  * Send an email using SendGrid
