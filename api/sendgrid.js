@@ -6,24 +6,23 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Initialize SendGrid with your API key
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "SG.zXKCHCgyRN2ZIzTwajaECg.E_Y2BrHpLSgdZV87tlOrQARc0z7M_So95A-g";
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "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";
 
 if (!SENDGRID_API_KEY) {
   console.warn('SENDGRID_API_KEY is not set in environment variables. Email functionality will not work.');
 } else {
   sgMail.setApiKey(SENDGRID_API_KEY);
-  console.log('SendGrid initialized successfully with API key');
+  console.log('SendGrid initialized with API key');
 }
 
-// Set the verified sender email - MUST BE VERIFIED IN SENDGRID DASHBOARD
-// This should be an email you have verified in your SendGrid account
-const VERIFIED_SENDER = process.env.VERIFIED_SENDER || "baqar.falconit@gmail.com";
+// IMPORTANT: This MUST be an email address you've verified in SendGrid
+// Using the verified sender email
+const VERIFIED_SENDER = process.env.VERIFIED_SENDER || "wamev32521@firain.com";
 
 /**
  * Send an email using SendGrid
  * @param {Object} emailData - The email data
  * @param {string} emailData.to - Recipient email address
- * @param {string} emailData.from - Sender email address (must be verified in SendGrid)
  * @param {string} emailData.subject - Email subject
  * @param {string} emailData.text - Plain text email content
  * @param {string} [emailData.html] - HTML email content (optional)
@@ -35,26 +34,25 @@ export const sendEmail = async (emailData) => {
       throw new Error('SendGrid API key is not configured');
     }
 
-    // Set default sender if not provided (must be a verified sender in SendGrid)
-    if (!emailData.from) {
-      emailData.from = VERIFIED_SENDER;
-    }
+    // Always use the verified sender - this is critical for SendGrid to work
+    const msg = {
+      ...emailData,
+      from: VERIFIED_SENDER // Always use the verified sender email
+    };
 
-    console.log('Preparing to send email with SendGrid:');
-    console.log('  - To:', emailData.to);
-    console.log('  - From:', emailData.from);
-    console.log('  - Subject:', emailData.subject);
-    console.log('  - API Key configured:', !!SENDGRID_API_KEY);
+    console.log('Sending email via SendGrid:');
+    console.log('  - To:', msg.to);
+    console.log('  - From:', msg.from);
+    console.log('  - Subject:', msg.subject);
     
-    // Send the email using SendGrid
     try {
-      const response = await sgMail.send(emailData);
-      console.log('Email sent successfully via SendGrid:', response[0].statusCode);
+      const response = await sgMail.send(msg);
+      console.log('Email sent successfully:', response[0].statusCode);
       return response;
     } catch (sgError) {
-      console.error('SendGrid Error:', sgError);
+      console.error('SendGrid Error:', sgError.message);
       if (sgError.response) {
-        console.error('SendGrid API error details:', sgError.response.body);
+        console.error('SendGrid API error details:', JSON.stringify(sgError.response.body, null, 2));
       }
       throw sgError;
     }
@@ -76,89 +74,71 @@ export const sendEmail = async (emailData) => {
 export const sendInvitationEmail = async (invitationData) => {
   const { to, inviterEmail, invitationLink, role } = invitationData;
   
-  try {
-    // HTML template for the invitation email
-    const htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #333;">You've Been Invited to ContractorPro</h1>
-        </div>
-        
-        <p style="font-size: 16px; line-height: 1.5; color: #555;">
-          Hello,
-        </p>
-        
-        <p style="font-size: 16px; line-height: 1.5; color: #555;">
-          You have been invited by <strong>${inviterEmail || 'ContractorPro Team'}</strong> to join ContractorPro as a <strong>${role || 'team member'}</strong>.
-        </p>
-        
-        <p style="font-size: 16px; line-height: 1.5; color: #555;">
-          ContractorPro helps construction professionals manage their assets, vendors, and team all in one place.
-        </p>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${invitationLink}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-            Accept Invitation
-          </a>
-        </div>
-        
-        <p style="font-size: 16px; line-height: 1.5; color: #555;">
-          Or copy and paste this link into your browser:
-        </p>
-        
-        <p style="font-size: 14px; line-height: 1.5; color: #777; word-break: break-all; background-color: #f5f5f5; padding: 10px; border-radius: 3px;">
-          ${invitationLink}
-        </p>
-        
-        <p style="font-size: 16px; line-height: 1.5; color: #555;">
-          This invitation will expire in 7 days.
-        </p>
-        
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 14px; color: #777; text-align: center;">
-          <p>If you did not expect this invitation, you can safely ignore this email.</p>
-        </div>
+  // HTML template for the invitation email
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #333;">You've Been Invited to ContractorPro</h1>
       </div>
-    `;
+      
+      <p style="font-size: 16px; line-height: 1.5; color: #555;">
+        Hello,
+      </p>
+      
+      <p style="font-size: 16px; line-height: 1.5; color: #555;">
+        You have been invited by <strong>${inviterEmail || 'ContractorPro Team'}</strong> to join ContractorPro as a <strong>${role || 'team member'}</strong>.
+      </p>
+      
+      <p style="font-size: 16px; line-height: 1.5; color: #555;">
+        ContractorPro helps construction professionals manage their assets, vendors, and team all in one place.
+      </p>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${invitationLink}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+          Accept Invitation
+        </a>
+      </div>
+      
+      <p style="font-size: 16px; line-height: 1.5; color: #555;">
+        Or copy and paste this link into your browser:
+      </p>
+      
+      <p style="font-size: 14px; line-height: 1.5; color: #777; word-break: break-all; background-color: #f5f5f5; padding: 10px; border-radius: 3px;">
+        ${invitationLink}
+      </p>
+      
+      <p style="font-size: 16px; line-height: 1.5; color: #555;">
+        This invitation will expire in 7 days.
+      </p>
+      
+      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 14px; color: #777; text-align: center;">
+        <p>If you did not expect this invitation, you can safely ignore this email.</p>
+      </div>
+    </div>
+  `;
 
-    // Plain text version as a fallback
-    const textContent = `
-      You've Been Invited to ContractorPro
-      
-      Hello,
-      
-      You have been invited by ${inviterEmail || 'ContractorPro Team'} to join ContractorPro as a ${role || 'team member'}.
-      
-      ContractorPro helps construction professionals manage their assets, vendors, and team all in one place.
-      
-      To accept the invitation, please visit: ${invitationLink}
-      
-      This invitation will expire in 7 days.
-      
-      If you did not expect this invitation, you can safely ignore this email.
-    `;
+  // Plain text version as a fallback
+  const textContent = `
+    You've Been Invited to ContractorPro
+    
+    Hello,
+    
+    You have been invited by ${inviterEmail || 'ContractorPro Team'} to join ContractorPro as a ${role || 'team member'}.
+    
+    ContractorPro helps construction professionals manage their assets, vendors, and team all in one place.
+    
+    To accept the invitation, please visit: ${invitationLink}
+    
+    This invitation will expire in 7 days.
+    
+    If you did not expect this invitation, you can safely ignore this email.
+  `;
 
-    // Prepare the email data
-    const emailData = {
-      to,
-      from: VERIFIED_SENDER, // Ensure we use a verified sender
-      subject: `Invitation to join ContractorPro as ${role || 'team member'}`,
-      text: textContent,
-      html: htmlContent,
-    };
-
-    // Log the full email data for debugging
-    console.log('Preparing to send invitation email with data:', {
-      to,
-      from: VERIFIED_SENDER,
-      subject: `Invitation to join ContractorPro as ${role || 'team member'}`,
-      invitationLink: invitationLink ? 'Valid link present' : 'Missing link',
-      apiKeyConfigured: !!SENDGRID_API_KEY,
-    });
-
-    // Send the email
-    return await sendEmail(emailData);
-  } catch (error) {
-    console.error('Error in sendInvitationEmail:', error);
-    throw error;
-  }
+  // Send the email using the main sendEmail function
+  return await sendEmail({
+    to,
+    subject: `Invitation to join ContractorPro as ${role || 'team member'}`,
+    text: textContent,
+    html: htmlContent,
+  });
 };
