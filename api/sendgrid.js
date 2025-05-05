@@ -5,19 +5,21 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-// Initialize SendGrid with your API key
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "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";
+// Initialize SendGrid with your API key - hardcode the latest API key for deployment
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || process.env.VITE_SENDGRID_API_KEY || "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";
 
+// Check for API key
 if (!SENDGRID_API_KEY) {
   console.warn('SENDGRID_API_KEY is not set in environment variables. Email functionality will not work.');
 } else {
   sgMail.setApiKey(SENDGRID_API_KEY);
-  console.log('SendGrid initialized with API key');
+  console.log('SendGrid initialized with API key:', SENDGRID_API_KEY.substring(0, 20) + '...');
 }
 
 // IMPORTANT: This MUST be an email address you've verified in SendGrid
-// Using the verified sender email
+// Using the verified sender email - hardcode for deployment
 const VERIFIED_SENDER = process.env.VERIFIED_SENDER || "wamev32521@firain.com";
+console.log('Using verified sender email:', VERIFIED_SENDER);
 
 /**
  * Send an email using SendGrid
@@ -30,6 +32,9 @@ const VERIFIED_SENDER = process.env.VERIFIED_SENDER || "wamev32521@firain.com";
  */
 export const sendEmail = async (emailData) => {
   try {
+    // Force re-initialization of API key on each request (helps with Vercel cold starts)
+    sgMail.setApiKey(SENDGRID_API_KEY);
+    
     if (!SENDGRID_API_KEY) {
       throw new Error('SendGrid API key is not configured');
     }
@@ -51,6 +56,7 @@ export const sendEmail = async (emailData) => {
       return response;
     } catch (sgError) {
       console.error('SendGrid Error:', sgError.message);
+      console.error('Error code:', sgError.code);
       if (sgError.response) {
         console.error('SendGrid API error details:', JSON.stringify(sgError.response.body, null, 2));
       }
@@ -94,8 +100,6 @@ export const sendInvitationEmail = async (invitationData) => {
       </p>
       
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${invitationLink}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-          Accept Invitation
         </a>
       </div>
       

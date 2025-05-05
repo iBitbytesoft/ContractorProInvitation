@@ -62,20 +62,9 @@ app.post('/api/send-email', handleSendEmail);
 async function handleSendEmail(req, res) {
   try {
     console.log("Received email request:", req.body);
-    console.log("Request headers:", req.headers);
     
     // Extract email data from the request body
     const { to, subject, text, inviterEmail, invitationLink, role } = req.body;
-    
-    // Optional: Re-enable auth check if needed
-    // const authHeader = req.headers.authorization;
-    // if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    //   console.error("Unauthorized email request - missing or invalid token");
-    //   return res.status(401).json({ 
-    //     success: false,
-    //     message: "Unauthorized"
-    //   });
-    // }
     
     if (!to) {
       return res.status(400).json({ 
@@ -89,55 +78,46 @@ async function handleSendEmail(req, res) {
       console.log("Processing invitation email to:", to);
       
       try {
-        // Create email data
+        // Create email data with verified sender
         const emailData = {
           to,
-          from: process.env.VERIFIED_SENDER || "baqar.falconit@gmail.com",
           subject: `You have been invited as a ${role}`,
           text: `You have received an invitation from ${inviterEmail || "ContractorPro"} \n\n${invitationLink}`,
           html: `
-            <div>
-              <h2>You've Been Invited to ContractorPro</h2>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+              <h2 style="color: #333;">You've Been Invited to ContractorPro</h2>
               <p>You have been invited by <strong>${inviterEmail || 'ContractorPro Team'}</strong> to join as a <strong>${role}</strong>.</p>
               <p>To accept the invitation, click the link below:</p>
-              <p><a href="${invitationLink}">${invitationLink}</a></p>
+              <p><a href="${invitationLink}" style="display: inline-block; background-color: #4f46e5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">${invitationLink}</a></p>
+              <p>If the button doesn't work, copy and paste this link into your browser:</p>
+              <p style="word-break: break-all;">${invitationLink}</p>
+              <p>This invitation will expire in 7 days.</p>
             </div>
           `
         };
         
         console.log("Email data prepared:", {
           to: emailData.to,
-          from: emailData.from,
           subject: emailData.subject
         });
         
         // Actually send the email via SendGrid
-        try {
-          await sendEmail(emailData);
-          
-          return res.status(200).json({
-            success: true,
-            message: "Invitation email sent successfully",
-            timestamp: new Date().toISOString()
-          });
-        } catch (sendError) {
-          console.error("Error sending email via SendGrid:", sendError);
-          
-          // Fallback to return success for UI to work properly
-          // Remove this in production once SendGrid is working
-          return res.status(200).json({
-            success: true,
-            message: "Invitation processed (email delivery attempted)",
-            timestamp: new Date().toISOString(),
-            note: "Email API error occurred but UI flow continues"
-          });
-        }
-      } catch (error) {
-        console.error("Error sending invitation email:", error);
+        await sendEmail(emailData);
+        
+        return res.status(200).json({
+          success: true,
+          message: "Invitation email sent successfully",
+          timestamp: new Date().toISOString()
+        });
+      } catch (sendError) {
+        console.error("Error sending email via SendGrid:", sendError);
+        
+        // Real error response - since we're fixing the actual issue
         return res.status(500).json({
           success: false,
           message: "Failed to send invitation email",
-          error: error.message || "Unknown error"
+          timestamp: new Date().toISOString(),
+          error: sendError.message || "Email delivery failed"
         });
       }
     } else {
