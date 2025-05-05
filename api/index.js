@@ -78,7 +78,7 @@ async function handleSendEmail(req, res) {
       console.log("Processing invitation email to:", to);
       
       try {
-        // Create email data with verified sender
+        // Using hardcoded credentials for all emails
         const emailData = {
           to,
           subject: `You have been invited as a ${role}`,
@@ -88,7 +88,7 @@ async function handleSendEmail(req, res) {
               <h2 style="color: #333;">You've Been Invited to ContractorPro</h2>
               <p>You have been invited by <strong>${inviterEmail || 'ContractorPro Team'}</strong> to join as a <strong>${role}</strong>.</p>
               <p>To accept the invitation, click the link below:</p>
-              <p><a href="${invitationLink}" style="display: inline-block; background-color: #4f46e5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">${invitationLink}</a></p>
+              <p><a href="${invitationLink}" style="display: inline-block; background-color: #4f46e5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">Accept Invitation</a></p>
               <p>If the button doesn't work, copy and paste this link into your browser:</p>
               <p style="word-break: break-all;">${invitationLink}</p>
               <p>This invitation will expire in 7 days.</p>
@@ -96,10 +96,7 @@ async function handleSendEmail(req, res) {
           `
         };
         
-        console.log("Email data prepared:", {
-          to: emailData.to,
-          subject: emailData.subject
-        });
+        console.log("Email data prepared with hardcoded credentials");
         
         // Actually send the email via SendGrid
         await sendEmail(emailData);
@@ -112,12 +109,13 @@ async function handleSendEmail(req, res) {
       } catch (sendError) {
         console.error("Error sending email via SendGrid:", sendError);
         
-        // Real error response - since we're fixing the actual issue
+        // Full error details for troubleshooting
         return res.status(500).json({
           success: false,
           message: "Failed to send invitation email",
           timestamp: new Date().toISOString(),
-          error: sendError.message || "Email delivery failed"
+          error: sendError.message || "Email delivery failed",
+          details: sendError.toString()
         });
       }
     } else {
@@ -132,7 +130,7 @@ async function handleSendEmail(req, res) {
       console.log("Sending regular email to:", to);
       
       try {
-        // Use the general email function
+        // Use the general email function with hardcoded credentials
         await sendEmail({
           to,
           subject,
@@ -150,7 +148,8 @@ async function handleSendEmail(req, res) {
         return res.status(500).json({
           success: false,
           message: "Failed to send email",
-          error: error.message
+          error: error.message,
+          details: error.toString()
         });
       }
     }
@@ -159,7 +158,8 @@ async function handleSendEmail(req, res) {
     res.status(500).json({ 
       success: false,
       message: "Failed to process email request", 
-      error: error.message || "Unknown error"
+      error: error.message || "Unknown error",
+      details: error.toString()
     });
   }
 }
