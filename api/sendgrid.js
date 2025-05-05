@@ -2,19 +2,23 @@
 import sgMail from '@sendgrid/mail';
 import dotenv from 'dotenv';
 
-// Load environment variables - but we won't use them, just hardcoding everything
+// Load environment variables
 dotenv.config();
 
-// HARDCODED CREDENTIALS - using the latest API key directly
-const SENDGRID_API_KEY = "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";
+// Get API key from environment variables
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || process.env.VITE_SENDGRID_API_KEY;
 
-// Initialize SendGrid with the hardcoded API key
-sgMail.setApiKey(SENDGRID_API_KEY);
-console.log('SendGrid initialized with hardcoded API key');
+// Check for API key
+if (!SENDGRID_API_KEY) {
+  console.warn('SENDGRID_API_KEY is not set in environment variables. Email functionality will not work.');
+} else {
+  sgMail.setApiKey(SENDGRID_API_KEY);
+  console.log('SendGrid initialized with API key from environment variables');
+}
 
-// HARDCODED verified sender email - verified in SendGrid
-const VERIFIED_SENDER = "wamev32521@firain.com";
-console.log('Using hardcoded verified sender email:', VERIFIED_SENDER);
+// Get verified sender from environment variables
+const VERIFIED_SENDER = process.env.VERIFIED_SENDER || process.env.VITE_VERIFIED_SENDER || "wamev32521@firain.com";
+console.log('Using verified sender email:', VERIFIED_SENDER);
 
 /**
  * Send an email using SendGrid
@@ -28,19 +32,22 @@ console.log('Using hardcoded verified sender email:', VERIFIED_SENDER);
 export const sendEmail = async (emailData) => {
   try {
     // Force re-initialization of API key on each request (helps with Vercel cold starts)
-    sgMail.setApiKey(SENDGRID_API_KEY);
+    if (SENDGRID_API_KEY) {
+      sgMail.setApiKey(SENDGRID_API_KEY);
+    } else {
+      throw new Error('SendGrid API key is not configured');
+    }
     
     // Always use the verified sender - this is critical for SendGrid to work
     const msg = {
       ...emailData,
-      from: VERIFIED_SENDER // Always use the hardcoded verified sender email
+      from: VERIFIED_SENDER // Use the verified sender email from env
     };
 
-    console.log('Sending email via SendGrid with hardcoded credentials:');
+    console.log('Sending email via SendGrid:');
     console.log('  - To:', msg.to);
     console.log('  - From:', msg.from);
     console.log('  - Subject:', msg.subject);
-    console.log('  - API Key (first 10 chars):', SENDGRID_API_KEY.substring(0, 10) + '...');
     
     try {
       const response = await sgMail.send(msg);
