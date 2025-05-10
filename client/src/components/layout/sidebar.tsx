@@ -12,6 +12,7 @@ import {
   LogOut
 } from "lucide-react";
 import { auth } from "@/lib/firebase";
+import logo from '../../assets/logo.jpg';
 
 interface SidebarProps {
   open?: boolean;
@@ -49,8 +50,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
   const sidebar = (
     <div className="flex flex-col h-full">
-      <div className="h-16 border-b flex items-center px-6">
-        <h1 className="text-lg font-bold">ContractorHub</h1>
+      <div className="h-16 border-b px-6">
+        <img src={logo} height="125" alt="logo" />
       </div>
 
       <ScrollArea className="flex-1 px-3 py-4">

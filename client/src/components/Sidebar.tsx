@@ -2,15 +2,16 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  LayoutDashboard, 
-  Truck, 
-  Users, 
+import {
+  LayoutDashboard,
+  Truck,
+  Users,
   FileText,
   Building2,
   Settings,
   LogOut
 } from "lucide-react";
+import logo from '../assets/logo.jpg';
 
 export function Sidebar() {
   const { user, signOut } = useAuth();
@@ -28,7 +29,7 @@ export function Sidebar() {
   return (
     <div className="flex flex-col w-64 bg-card border-r">
       <div className="p-4">
-        <h2 className="text-2xl font-bold text-primary">ContractorPro</h2>
+        <img src={logo} width="125" alt="logo" />
       </div>
 
       <nav className="flex-1 px-2 py-4 space-y-1">
@@ -40,7 +41,7 @@ export function Sidebar() {
                 variant="ghost"
                 className={`
                   w-full justify-start text-sm
-                  ${location === item.href 
+                  ${location === item.href
                     ? "bg-gradient-to-br from-primary/90 via-primary-900 to-black text-primary-foreground"
                     : "hover:bg-accent"
                   }
