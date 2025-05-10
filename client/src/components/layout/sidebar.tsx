@@ -50,8 +50,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
   const sidebar = (
     <div className="flex flex-col h-full">
-      <div className="h-16 border-b px-6">
-        <img src={logo} height="125" alt="logo" />
+      <div className="h-16 gap-2 flex items-center border-b px-1">
+        <h2 className="text-md font-bold text-primary">ContractorHub</h2>
+        <img src={logo} height="100" alt="logo" />
       </div>
 
       <ScrollArea className="flex-1 px-3 py-4">

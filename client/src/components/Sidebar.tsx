@@ -28,8 +28,9 @@ export function Sidebar() {
 
   return (
     <div className="flex flex-col w-64 bg-card border-r">
-      <div className="p-4">
-        <img src={logo} width="125" alt="logo" />
+      <div className="py-2 px-1 gap-2 flex items-center">
+        <h2 className="text-md font-bold text-primary">ContractorPro</h2>
+        <img src={logo} width="100" alt="logo" />
       </div>
 
       <nav className="flex-1 px-2 py-4 space-y-1">
